@@ -1,0 +1,179 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+}
+
+/* Scrollable content area above the fixed tab bar. */
+.app__content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---- Screens ---- */
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.screen__header {
+  padding: calc(env(safe-area-inset-top) + 20px) 20px 12px;
+}
+
+.screen__header h1 {
+  font-size: 28px;
+}
+
+.screen__body {
+  flex: 1;
+  padding: 8px 20px 24px;
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.placeholder__hint {
+  font-size: 18px;
+  color: var(--text);
+}
+
+.placeholder__lines {
+  display: flex;
+  gap: 8px;
+  font-size: 22px;
+}
+
+.placeholder__note {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+/* ---- Tab bar ---- */
+.tabbar {
+  display: flex;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tabbar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: var(--tab-h);
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  transition: color 0.15s;
+}
+
+.tabbar__item.is-active {
+  color: var(--text);
+}
+
+.tabbar__icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.tabbar__label {
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+/* ---- Trip list (History) ---- */
+.trip-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trip-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.trip-card__lines {
+  display: flex;
+  gap: 4px;
+  font-size: 18px;
+}
+
+.trip-card__meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.trip-card__tag {
+  text-transform: capitalize;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.trip-card__meta time {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.trip-card__delete {
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  padding: 8px;
+}
+
+/* ---- Stats ---- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 20px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.stat__value {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.stat__label {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

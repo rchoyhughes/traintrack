@@ -1,0 +1,82 @@
+/* TrainTrack design system — MTA signage aesthetic.
+   Helvetica family, black/white, official line colors. See spec §3. */
+
+:root {
+  /* Typography: true Helvetica on Apple devices, Arial fallback elsewhere. */
+  --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  /* MTA signage palette: white on black. */
+  --bg: #000000;
+  --surface: #18181a;
+  --surface-2: #232326;
+  --border: #34343a;
+  --text: #ffffff;
+  --text-dim: #9a9aa0;
+  --accent: #0039a6; /* IND blue, used for primary actions */
+
+  --tab-h: 56px;
+
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  /* Prevent rubber-band scroll revealing white behind the app. */
+  overscroll-behavior: none;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+button {
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+/* Circular MTA line bullet. Color set inline per line. */
+.bullet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.85em;
+  flex: none;
+}
