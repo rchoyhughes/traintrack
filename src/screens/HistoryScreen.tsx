@@ -29,23 +29,6 @@ export function HistoryScreen() {
 
   const selected = trips?.find((t) => t.id === selectedId) ?? null
 
-  if (selected && byId && shapes) {
-    return (
-      <div className="screen">
-        <TripDetail
-          trip={selected}
-          byId={byId}
-          shapes={shapes}
-          onClose={() => setSelectedId(null)}
-          onDelete={() => {
-            db.trips.delete(selected.id)
-            setSelectedId(null)
-          }}
-        />
-      </div>
-    )
-  }
-
   return (
     <div className="screen">
       <header className="screen__header">
@@ -76,18 +59,24 @@ export function HistoryScreen() {
                     <time>{new Date(trip.timestamp).toLocaleString()}</time>
                   </div>
                 </button>
-                <button
-                  className="trip-card__delete"
-                  onClick={() => db.trips.delete(trip.id)}
-                  aria-label="Delete trip"
-                >
-                  ✕
-                </button>
               </li>
             ))}
           </ul>
         )}
       </div>
+
+      {selected && byId && shapes && (
+        <TripDetail
+          trip={selected}
+          byId={byId}
+          shapes={shapes}
+          onClose={() => setSelectedId(null)}
+          onDelete={() => {
+            db.trips.delete(selected.id)
+            setSelectedId(null)
+          }}
+        />
+      )}
     </div>
   )
 }

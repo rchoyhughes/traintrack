@@ -61,7 +61,7 @@ export function TripDetail({
   const destination = byId.get(trip.destination)
 
   return (
-    <div className="detail">
+    <div className="fullscreen">
       <div className="detail__bar">
         <button className="detail__back" onClick={onClose}>
           ← Back
