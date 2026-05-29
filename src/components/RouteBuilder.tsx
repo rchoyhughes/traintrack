@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { LineBullet } from './LineBullet'
 import { complexesOnLine, indexComplexes } from '../lib/route'
 import { oostNeighbors } from '../data/transfers'
+import { ALL_LINES } from '../data/lines'
 import type { Complex } from '../data/gtfs'
 import type { Segment } from '../types'
 
@@ -32,6 +33,9 @@ export function RouteBuilder({
   // OOST-linked one if the user walked there).
   const [boardAt, setBoardAt] = useState<Complex | null>(null)
   const [filter, setFilter] = useState('')
+  // Fallbacks for unusual reroutes: board any line / get off at any station.
+  const [allLinesMode, setAllLinesMode] = useState(false)
+  const [allStopsMode, setAllStopsMode] = useState(false)
 
   // Where we are now: destination of the last segment, or the trip origin.
   const current = segments.length
@@ -52,15 +56,19 @@ export function RouteBuilder({
   const transferStops = useMemo(() => {
     if (!line || !boardAt) return []
     const f = filter.trim().toLowerCase()
-    return complexesOnLine(complexes, line)
+    const pool = allStopsMode
+      ? [...complexes].sort((a, b) => a.name.localeCompare(b.name))
+      : complexesOnLine(complexes, line)
+    return pool
       .filter((c) => c.id !== boardAt.id && c.id !== destination.id)
       .filter((c) => !f || c.name.toLowerCase().includes(f))
-  }, [line, boardAt, filter, complexes, destination.id])
+  }, [line, boardAt, filter, complexes, destination.id, allStopsMode])
 
   function board(l: string, at: Complex) {
     setLine(l)
     setBoardAt(at)
     setFilter('')
+    setAllStopsMode(false)
   }
 
   function arrive() {
@@ -80,6 +88,7 @@ export function RouteBuilder({
     setLine(null)
     setBoardAt(null)
     setFilter('')
+    setAllLinesMode(false)
   }
 
   function undo() {
@@ -104,7 +113,7 @@ export function RouteBuilder({
             <strong>{current.name}</strong> — which line?
           </p>
           <div className="builder__lines">
-            {current.allLines.map((l) => (
+            {(allLinesMode ? ALL_LINES : current.allLines).map((l) => (
               <button
                 key={l}
                 className="builder__linebtn"
@@ -114,6 +123,14 @@ export function RouteBuilder({
               </button>
             ))}
           </div>
+          {!allLinesMode && (
+            <button
+              className="builder__more"
+              onClick={() => setAllLinesMode(true)}
+            >
+              Show all lines (reroute)
+            </button>
+          )}
 
           {oostLinks.map((link) => (
             <div key={link.id} className="builder__oost">
@@ -150,10 +167,18 @@ export function RouteBuilder({
           <input
             className="search__input"
             type="search"
-            placeholder="Or transfer at…"
+            placeholder={allStopsMode ? 'Search any station…' : 'Or transfer at…'}
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
+          {!allStopsMode && (
+            <button
+              className="builder__more"
+              onClick={() => setAllStopsMode(true)}
+            >
+              Show all stations (reroute)
+            </button>
+          )}
           <ul className="search__results">
             {transferStops.slice(0, 30).map((c) => (
               <li

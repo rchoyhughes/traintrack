@@ -167,14 +167,31 @@
 .builder__lines {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  font-size: 24px;
+  gap: 12px;
+  /* Larger bullets = comfortable touch targets on mobile. */
+  font-size: 32px;
 }
 
 .builder__linebtn {
   border: none;
   background: none;
-  padding: 0;
+  padding: 4px;
+  /* Ensure a ~44px minimum tap target regardless of bullet size. */
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.builder__more {
+  align-self: flex-start;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  text-decoration: underline;
+  padding: 4px 0;
 }
 
 .builder__arrive {

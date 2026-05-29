@@ -38,6 +38,14 @@ export const LINE_COLORS: Record<string, string> = {
   S: '#808183',
 }
 
+/** Every line in the system, in standard order. Used by the route builder's
+ *  "show all lines" fallback for unusual reroutes. */
+export const ALL_LINES: string[] = [
+  '1', '2', '3', '4', '5', '6', '7',
+  'A', 'C', 'E', 'B', 'D', 'F', 'M',
+  'G', 'J', 'Z', 'L', 'N', 'Q', 'R', 'W', 'S',
+]
+
 /** Untraveled / unknown segment color. */
 export const DIM_GRAY = '#3a3a3a'
 
