@@ -20,6 +20,8 @@ interface RiddenSpan {
   coords: [number, number][]
   color: string
   weight: number
+  opacity: number
+  glow: number
 }
 
 /**
@@ -67,13 +69,21 @@ export function MapScreen() {
       if (!ca || !cb) continue
       const coords = snapSegment(shapes, line, [ca.lat, ca.lon], [cb.lat, cb.lon])
       if (!coords) continue
+      // Frequency intensity 0..1 on a log scale (~48 rides saturates).
+      // Drives weight, opacity, and glow together so heavy corridors pop
+      // and one-off trips recede toward the dim base.
+      const t = Math.min(Math.log2(1 + n) / 5.6, 1)
       spans.push({
         key,
         coords,
         color: lineColor(line),
-        weight: 3 + Math.min(n, 6) * 1.6, // thicker with more rides
+        weight: 1.5 + t * 7.5, // ~2.8px (1x) → 9px (heavy commute)
+        opacity: 0.4 + t * 0.6, // ~0.5 (faint) → 1.0 (vivid)
+        glow: t * 0.3, // barely-there for one-offs, bright for the commute
       })
     }
+    // Draw faint spans first so heavy corridors render on top.
+    spans.sort((a, b) => a.weight - b.weight)
     return spans
   }, [shapes, byId, trips])
 
@@ -119,7 +129,24 @@ export function MapScreen() {
               )),
             )}
 
-            {/* Ridden spans: line color, thicker with frequency. */}
+            {/* White glow underlay — scales with frequency, so heavy
+                corridors read as "lit up" while one-offs barely glow. */}
+            {ridden.map((s) => (
+              <Polyline
+                key={`glow-${s.key}`}
+                positions={s.coords}
+                interactive={false}
+                pathOptions={{
+                  color: '#ffffff',
+                  weight: s.weight + 2.5,
+                  opacity: s.glow,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                }}
+              />
+            ))}
+
+            {/* Ridden spans: line color, brighter + thicker with frequency. */}
             {ridden.map((s) => (
               <Polyline
                 key={s.key}
@@ -127,8 +154,9 @@ export function MapScreen() {
                 pathOptions={{
                   color: s.color,
                   weight: s.weight,
-                  opacity: 0.95,
+                  opacity: s.opacity,
                   lineCap: 'round',
+                  lineJoin: 'round',
                 }}
               />
             ))}
