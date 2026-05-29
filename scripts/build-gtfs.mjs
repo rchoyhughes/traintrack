@@ -87,13 +87,14 @@ function parseRecords(text) {
 const round = (n) => Number(Number(n).toFixed(COORD_PRECISION))
 
 /**
- * Normalize a GTFS route_id to its public line label, matching the clean
- * vocabulary in Stations.csv "Daytime Routes":
+ * Normalize a GTFS route_id to its public line label:
  *   express variants  6X→6, 7X→7, FX→F
- *   shuttles          FS, GS, H → S
+ *   42 St shuttle      GS→S
+ * The Franklin Av (FS) and Rockaway Park (H) shuttles are kept DISTINCT —
+ * they have their own bullets (S with an F / R subscript).
  */
 function normalizeRoute(r) {
-  if (r === 'FS' || r === 'GS' || r === 'H') return 'S'
+  if (r === 'GS') return 'S'
   if (/^[1-9]X$|^FX$/.test(r)) return r.slice(0, -1)
   return r
 }
@@ -179,9 +180,15 @@ function buildStations(stationsPath, stationRoutes) {
     .map((r) => {
       const id = r['GTFS Stop ID']
       // "Daytime Routes" is space-separated, e.g. "N W" or "4 5 6".
-      const lines = r['Daytime Routes'].trim().split(/\s+/).filter(Boolean)
+      let lines = r['Daytime Routes'].trim().split(/\s+/).filter(Boolean)
       // Full union across all service periods (for the route builder).
       const all = stationRoutes.get(id)
+      // Stations.csv labels every shuttle "S"; resolve which one actually
+      // serves this station (Franklin=FS, Rockaway=H, 42 St=S) from the feed.
+      if (lines.includes('S') && all) {
+        const shuttle = all.has('FS') ? 'FS' : all.has('H') ? 'H' : 'S'
+        lines = lines.map((l) => (l === 'S' ? shuttle : l))
+      }
       const allLines = all
         ? [...new Set([...all, ...lines])].sort(routeOrder)
         : lines
@@ -240,8 +247,10 @@ function buildShapes(gtfsDir) {
   // route_id -> array of distinct polylines (ordered coords)
   const routeShapes = new Map()
   for (const [id, pts] of points) {
-    const route = shapeRoute.get(id)
-    if (!route) continue
+    const raw = shapeRoute.get(id)
+    if (!raw) continue
+    // Normalize so geometry keys match segment line codes (GS→S, 6X→6, …).
+    const route = normalizeRoute(raw)
     pts.sort((a, b) => a.seq - b.seq)
     const coords = pts.map((p) => [p.lat, p.lon])
     if (!routeShapes.has(route)) routeShapes.set(route, [])

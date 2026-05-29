@@ -34,8 +34,10 @@ export const LINE_COLORS: Record<string, string> = {
   Q: '#FCCC0A',
   R: '#FCCC0A',
   W: '#FCCC0A',
-  // Shuttles
-  S: '#808183',
+  // Shuttles (all the same gray; bullets differ by subscript)
+  S: '#808183', // 42 St Shuttle
+  FS: '#808183', // Franklin Av Shuttle
+  H: '#808183', // Rockaway Park Shuttle
 }
 
 /** Every line in the system, in standard order. Used by the route builder's
@@ -43,7 +45,8 @@ export const LINE_COLORS: Record<string, string> = {
 export const ALL_LINES: string[] = [
   '1', '2', '3', '4', '5', '6', '7',
   'A', 'C', 'E', 'B', 'D', 'F', 'M',
-  'G', 'J', 'Z', 'L', 'N', 'Q', 'R', 'W', 'S',
+  'G', 'J', 'Z', 'L', 'N', 'Q', 'R', 'W',
+  'S', 'FS', 'H', // 42 St, Franklin Av, Rockaway Park shuttles
 ]
 
 /** Untraveled / unknown segment color. */
