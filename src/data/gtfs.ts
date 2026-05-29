@@ -25,6 +25,7 @@ export type Shapes = Record<string, [number, number][][]>
 export interface Complex {
   id: string
   name: string
+  borough: string
   stationIds: string[]
   lines: string[]
   lat: number
@@ -63,6 +64,7 @@ export function groupComplexes(stations: Station[]): Complex[] {
     complexes.push({
       id,
       name: members[0].name,
+      borough: members[0].borough,
       stationIds: members.map((m) => m.id),
       lines,
       lat: members.reduce((s, m) => s + m.lat, 0) / members.length,

@@ -105,6 +105,166 @@
   letter-spacing: 0;
 }
 
+/* ---- Buttons ---- */
+.btn {
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 12px 20px;
+}
+
+/* ---- Station search ---- */
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search__label {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.search__input {
+  width: 100%;
+  font-family: var(--font);
+  font-size: 17px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  outline: none;
+}
+
+.search__input:focus {
+  border-color: var(--text-dim);
+}
+
+.search__results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.search__hint {
+  color: var(--text-dim);
+  font-size: 14px;
+  padding: 8px 2px;
+}
+
+.search__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.search__star {
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px;
+}
+
+.search__star.is-on {
+  color: #fccc0a;
+}
+
+.search__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.search__name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.search__borough {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.search__lines {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 3px;
+  font-size: 15px;
+  max-width: 40%;
+}
+
+/* ---- Journey summary (Log) ---- */
+.journey {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.journey__arrow {
+  align-self: center;
+  color: var(--text-dim);
+  font-size: 18px;
+}
+
+.chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  min-width: 0;
+}
+
+.chip--empty {
+  border-style: dashed;
+}
+
+.chip__role {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+.chip__name {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip__name--dim {
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.chip__lines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  font-size: 13px;
+}
+
 /* ---- Trip list (History) ---- */
 .trip-list {
   list-style: none;
