@@ -1,7 +1,11 @@
 .app {
   display: flex;
   flex-direction: column;
-  height: 100svh;
+  /* dvh (dynamic viewport) is correct in an installed iOS PWA; svh there is
+     measured against a phantom Safari toolbar, leaving dead space. */
+  height: 100dvh;
+  position: relative;
+  overflow: hidden;
 }
 
 /* ---- Top app bar (brand + menu) ---- */
@@ -104,7 +108,9 @@
 
 /* ---- Floating "liquid glass" nav pill ---- */
 .navbar {
-  position: fixed;
+  /* absolute within the relative, dvh-tall .app — avoids iOS standalone's
+     fixed-positioning viewport quirk that left dead space below the pill. */
+  position: absolute;
   left: 0;
   right: 0;
   bottom: calc(env(safe-area-inset-bottom) + 12px);
@@ -161,7 +167,7 @@
 
 /* ---- Fullscreen overlays (trip detail, about) ---- */
 .fullscreen {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 90;
   background: var(--bg);
@@ -173,7 +179,7 @@
 
 /* ---- Bottom sheet (menu) ---- */
 .sheet-overlay {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 100;
   background: rgba(0, 0, 0, 0.55);
