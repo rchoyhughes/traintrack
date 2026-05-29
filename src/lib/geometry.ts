@@ -9,6 +9,28 @@ function dist2(a: Pt, b: Pt): number {
   return dlat * dlat + dlon * dlon
 }
 
+const R_MILES = 3958.8
+
+/** Great-circle distance in miles between two [lat, lon] points. */
+function haversineMiles(a: Pt, b: Pt): number {
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const dLat = toRad(b[0] - a[0])
+  const dLon = toRad(b[1] - a[1])
+  const lat1 = toRad(a[0])
+  const lat2 = toRad(b[0])
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2
+  return 2 * R_MILES * Math.asin(Math.sqrt(h))
+}
+
+/** Total length in miles along a polyline (the real ridden track). */
+export function pathMiles(coords: Pt[]): number {
+  let m = 0
+  for (let i = 1; i < coords.length; i++) m += haversineMiles(coords[i - 1], coords[i])
+  return m
+}
+
 /** Index of the polyline point nearest to `p`, with its distance. */
 function nearest(poly: Pt[], p: Pt): { idx: number; d: number } {
   let idx = 0

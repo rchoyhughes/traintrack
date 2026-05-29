@@ -467,15 +467,29 @@
 .trip-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px;
+  gap: 4px;
+  padding: 4px 10px 4px 4px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
 }
 
+.trip-card__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px;
+  border: none;
+  background: none;
+  color: var(--text);
+  text-align: left;
+  min-width: 0;
+}
+
 .trip-card__lines {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   font-size: 18px;
 }
@@ -505,6 +519,121 @@
   color: var(--text-dim);
   font-size: 16px;
   padding: 8px;
+  flex: none;
+}
+
+/* ---- Trip detail ---- */
+.detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.detail__bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top) + 12px) 16px 8px;
+}
+
+.detail__back {
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  padding: 6px 0;
+}
+
+.detail__del {
+  border: none;
+  background: none;
+  color: #ee352e;
+  font-size: 15px;
+  padding: 6px 0;
+}
+
+.detail__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 0 16px 12px;
+}
+
+.detail__head time {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.detail__miles {
+  margin-left: auto;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.detail__map {
+  height: 260px;
+  width: 100%;
+  background: #000;
+}
+
+.detail__route {
+  list-style: none;
+  margin: 0;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail__stop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.detail__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  flex: none;
+}
+
+.detail__dot--end {
+  background: #fff;
+  width: 11px;
+  height: 11px;
+}
+
+.detail__leg {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail__ride {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Align the bullet under the timeline dots, with a connecting line. */
+  padding: 6px 0;
+  margin-left: -1px;
+  border-left: 2px solid var(--border);
+  padding-left: 16px;
+  font-size: 18px;
+}
+
+.detail__walk {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-style: italic;
+  padding: 4px 0 4px 18px;
+}
+
+.detail__to {
+  font-size: 14px;
+  color: var(--text-dim);
 }
 
 /* ---- Stats ---- */
