@@ -378,12 +378,18 @@
   font-size: 15px;
 }
 
+.builder__step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .builder__lines {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  /* Larger bullets = comfortable touch targets on mobile. */
-  font-size: 32px;
+  /* Large bullets = comfortable, clearly-tappable targets on mobile. */
+  font-size: 26px;
 }
 
 .builder__linebtn {
@@ -409,14 +415,15 @@
 }
 
 .builder__arrive {
+  width: 100%;
   border: none;
   border-radius: 10px;
   background: #00933c;
   color: #fff;
   font-size: 16px;
   font-weight: 700;
-  padding: 14px;
-  text-align: left;
+  padding: 15px;
+  text-align: center;
 }
 
 .builder__undo {

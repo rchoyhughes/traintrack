@@ -65,6 +65,9 @@ h3 {
 
 button {
   font-family: var(--font);
+  /* Inherit size so line bullets nested in buttons (route builder, chips,
+     history cards) aren't shrunk to the UA default button font-size. */
+  font-size: inherit;
   cursor: pointer;
 }
 
