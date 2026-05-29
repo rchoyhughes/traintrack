@@ -4,6 +4,7 @@ import { AppHeader } from './components/AppHeader'
 import { MenuSheet } from './components/MenuSheet'
 import { InstallPrompt } from './components/InstallPrompt'
 import { OverlayProvider, useOverlayOpen } from './components/overlay'
+import { DebugViewport } from './components/DebugViewport'
 import { LogScreen } from './screens/LogScreen'
 import { HistoryScreen } from './screens/HistoryScreen'
 import { MapScreen } from './screens/MapScreen'
@@ -48,6 +49,7 @@ function AppShell() {
 
   return (
     <div className="app">
+      <DebugViewport />
       {!overlayOpen && <AppHeader onMenu={() => setMenuOpen(true)} />}
 
       <main className="app__content">
