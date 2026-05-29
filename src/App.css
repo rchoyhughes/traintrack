@@ -667,3 +667,213 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+/* ---- Stats page ---- */
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.stats__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0 4px;
+}
+
+.stats__hero-value {
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.stats__hero-unit {
+  font-size: 14px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 6px;
+}
+
+.stats .stat-grid {
+  margin-bottom: 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.stats .stat {
+  padding: 14px 4px;
+}
+
+.stats .stat__value {
+  font-size: 26px;
+}
+
+.stats__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stats__section-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+/* Generic ranked row */
+.stats__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats__rank {
+  width: 18px;
+  color: var(--text-dim);
+  font-size: 14px;
+  font-weight: 700;
+  flex: none;
+}
+
+.stats__row-name {
+  flex: 1;
+  font-size: 15px;
+  min-width: 0;
+}
+
+.stats__row-lines {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 3px;
+  font-size: 13px;
+  max-width: 45%;
+  flex: none;
+}
+
+.stats__row-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dim);
+  flex: none;
+}
+
+/* Meter (coverage bars) */
+.stats__meter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stats__meter-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.stats__bar-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  /* Lighter than the surface so the empty portion reads as a bar even at
+     low fill (e.g. 5% coverage). */
+  background: #3a3a42;
+  overflow: hidden;
+}
+
+/* Coverage meters: full-width track under the label. Override flex:1 (which
+   would collapse the 8px height to zero inside the column layout). */
+.stats__meter .stats__bar-track {
+  width: 100%;
+  flex: none;
+}
+
+.stats__bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  min-width: 2px;
+}
+
+/* Bar rows (lines, tags) */
+.stats__bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.stats__tag-label {
+  width: 70px;
+  font-size: 14px;
+  text-transform: capitalize;
+  flex: none;
+}
+
+/* Facts */
+.stats__fact {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats__fact-label {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.stats__fact-value {
+  font-size: 15px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.stats__fact-sub {
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+/* Day-of-week mini chart */
+.stats__dow {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  height: 80px;
+  margin-top: 8px;
+}
+
+.stats__dow-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.stats__dow-bar-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.stats__dow-bar {
+  width: 100%;
+  background: var(--accent);
+  border-radius: 3px 3px 0 0;
+  min-height: 2px;
+}
+
+.stats__dow-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
