@@ -15,8 +15,10 @@ export interface Station {
   borough: string
   lat: number
   lon: number
-  /** Line short names serving this station, e.g. ["N", "W"]. */
+  /** Daytime line short names, for display, e.g. ["N", "W"]. */
   lines: string[]
+  /** All lines that ever serve this station (incl. off-peak), for routing. */
+  allLines: string[]
 }
 
 /** route short name -> array of polylines, each a list of [lat, lon]. */
@@ -28,7 +30,10 @@ export interface Complex {
   name: string
   borough: string
   stationIds: string[]
+  /** Daytime lines, for display. */
   lines: string[]
+  /** All lines ever serving the complex (incl. off-peak), for routing. */
+  allLines: string[]
   lat: number
   lon: number
 }
@@ -62,12 +67,14 @@ export function groupComplexes(stations: Station[]): Complex[] {
   const complexes: Complex[] = []
   for (const [id, members] of byId) {
     const lines = [...new Set(members.flatMap((m) => m.lines))].sort()
+    const allLines = [...new Set(members.flatMap((m) => m.allLines))].sort()
     complexes.push({
       id,
       name: COMPLEX_NAMES[id] ?? members[0].name,
       borough: members[0].borough,
       stationIds: members.map((m) => m.id),
       lines,
+      allLines,
       lat: members.reduce((s, m) => s + m.lat, 0) / members.length,
       lon: members.reduce((s, m) => s + m.lon, 0) / members.length,
     })

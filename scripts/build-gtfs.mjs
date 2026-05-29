@@ -86,6 +86,26 @@ function parseRecords(text) {
 
 const round = (n) => Number(Number(n).toFixed(COORD_PRECISION))
 
+/**
+ * Normalize a GTFS route_id to its public line label, matching the clean
+ * vocabulary in Stations.csv "Daytime Routes":
+ *   express variants  6X→6, 7X→7, FX→F
+ *   shuttles          FS, GS, H → S
+ */
+function normalizeRoute(r) {
+  if (r === 'FS' || r === 'GS' || r === 'H') return 'S'
+  if (/^[1-9]X$|^FX$/.test(r)) return r.slice(0, -1)
+  return r
+}
+
+// route comparator: numeric lines first (1,2,3…), then letters (A,B,C…).
+function routeOrder(a, b) {
+  const na = /^\d/.test(a)
+  const nb = /^\d/.test(b)
+  if (na !== nb) return na ? -1 : 1
+  return na ? Number(a) - Number(b) : a.localeCompare(b)
+}
+
 // ---- ensure raw data is present ----
 function ensureRawData() {
   mkdirSync(CACHE, { recursive: true })
@@ -110,21 +130,72 @@ function ensureRawData() {
   return { gtfsDir, stationsPath }
 }
 
+/**
+ * Build the full set of routes that *ever* serve each station, across all
+ * service periods (incl. late-night/weekend), by joining stop_times → trips.
+ * Captures e.g. the late-night 4 at 51 St that "Daytime Routes" omits.
+ * Returns Map<parentStopId, Set<normalizedRoute>>.
+ */
+function buildStationRoutes(gtfsDir) {
+  // child stop_id -> parent station id (from stops.txt)
+  const stops = parseRecords(readFileSync(join(gtfsDir, 'stops.txt'), 'utf8'))
+  const parentOf = new Map()
+  for (const s of stops) {
+    parentOf.set(s.stop_id, s.parent_station || s.stop_id)
+  }
+
+  // trip_id -> route_id (from trips.txt)
+  const trips = parseRecords(readFileSync(join(gtfsDir, 'trips.txt'), 'utf8'))
+  const tripRoute = new Map()
+  for (const t of trips) tripRoute.set(t.trip_id, t.route_id)
+
+  // Stream stop_times.txt by column index (large, but no quoted fields).
+  const text = readFileSync(join(gtfsDir, 'stop_times.txt'), 'utf8')
+  const lines = text.split('\n')
+  const header = lines[0].split(',')
+  const tripIdx = header.indexOf('trip_id')
+  const stopIdx = header.indexOf('stop_id')
+
+  const byStop = new Map()
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i]
+    if (!line) continue
+    const cols = line.split(',')
+    const route = tripRoute.get(cols[tripIdx])
+    if (!route) continue
+    const parent = parentOf.get(cols[stopIdx]) ?? cols[stopIdx]
+    let set = byStop.get(parent)
+    if (!set) byStop.set(parent, (set = new Set()))
+    set.add(normalizeRoute(route))
+  }
+  return byStop
+}
+
 // ---- build stations.json from Stations.csv ----
-function buildStations(stationsPath) {
+function buildStations(stationsPath, stationRoutes) {
   const records = parseRecords(readFileSync(stationsPath, 'utf8'))
   const stations = records
     .filter((r) => r['GTFS Stop ID'])
-    .map((r) => ({
-      id: r['GTFS Stop ID'],
-      complexId: r['Complex ID'],
-      name: r['Stop Name'],
-      borough: r['Borough'],
-      lat: round(r['GTFS Latitude']),
-      lon: round(r['GTFS Longitude']),
+    .map((r) => {
+      const id = r['GTFS Stop ID']
       // "Daytime Routes" is space-separated, e.g. "N W" or "4 5 6".
-      lines: r['Daytime Routes'].trim().split(/\s+/).filter(Boolean),
-    }))
+      const lines = r['Daytime Routes'].trim().split(/\s+/).filter(Boolean)
+      // Full union across all service periods (for the route builder).
+      const all = stationRoutes.get(id)
+      const allLines = all
+        ? [...new Set([...all, ...lines])].sort(routeOrder)
+        : lines
+      return {
+        id,
+        complexId: r['Complex ID'],
+        name: r['Stop Name'],
+        borough: r['Borough'],
+        lat: round(r['GTFS Latitude']),
+        lon: round(r['GTFS Longitude']),
+        lines,
+        allLines,
+      }
+    })
   return stations
 }
 
@@ -186,9 +257,15 @@ function main() {
   const { gtfsDir, stationsPath } = ensureRawData()
   mkdirSync(OUT, { recursive: true })
 
-  const stations = buildStations(stationsPath)
+  const stationRoutes = buildStationRoutes(gtfsDir)
+  const stations = buildStations(stationsPath, stationRoutes)
   writeFileSync(join(OUT, 'stations.json'), JSON.stringify(stations))
-  console.log(`stations.json  — ${stations.length} stations`)
+  const extraLines = stations.filter(
+    (s) => s.allLines.length > s.lines.length,
+  ).length
+  console.log(
+    `stations.json  — ${stations.length} stations (${extraLines} with extra off-peak lines)`,
+  )
 
   const shapes = buildShapes(gtfsDir)
   writeFileSync(join(OUT, 'shapes.json'), JSON.stringify(shapes))

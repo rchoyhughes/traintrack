@@ -47,7 +47,7 @@ export function RouteBuilder({
     [current.id, byId],
   )
 
-  const destOnLine = line ? destination.lines.includes(line) : false
+  const destOnLine = line ? destination.allLines.includes(line) : false
 
   const transferStops = useMemo(() => {
     if (!line || !boardAt) return []
@@ -104,7 +104,7 @@ export function RouteBuilder({
             <strong>{current.name}</strong> — which line?
           </p>
           <div className="builder__lines">
-            {current.lines.map((l) => (
+            {current.allLines.map((l) => (
               <button
                 key={l}
                 className="builder__linebtn"
@@ -121,7 +121,7 @@ export function RouteBuilder({
                 ⇄ transfer to {link.name}
               </span>
               <div className="builder__lines">
-                {link.lines.map((l) => (
+                {link.allLines.map((l) => (
                   <button
                     key={l}
                     className="builder__linebtn"
