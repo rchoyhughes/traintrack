@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
 import { StationSearch } from '../components/StationSearch'
 import { RouteBuilder } from '../components/RouteBuilder'
 import { LineBullet } from '../components/LineBullet'
@@ -9,6 +10,54 @@ import type { Complex } from '../data/gtfs'
 
 type Step = 'origin' | 'destination' | 'route' | 'confirm'
 
+interface CommonTrip {
+  origin: string
+  destination: string
+  segments: Segment[]
+  tag: Tag
+  count: number
+}
+
+/** Most-frequent directional trips, with their most-common route + tag. */
+function deriveCommonTrips(
+  trips: { origin: string; destination: string; segments: Segment[]; tag: Tag }[],
+): CommonTrip[] {
+  const groups = new Map<
+    string,
+    { origin: string; destination: string; count: number; routes: Map<string, { segs: Segment[]; n: number }>; tags: Map<string, number> }
+  >()
+  for (const t of trips) {
+    if (!t.origin || !t.destination) continue
+    const key = `${t.origin}>${t.destination}`
+    let g = groups.get(key)
+    if (!g) {
+      g = { origin: t.origin, destination: t.destination, count: 0, routes: new Map(), tags: new Map() }
+      groups.set(key, g)
+    }
+    g.count++
+    const sig = JSON.stringify(t.segments)
+    const r = g.routes.get(sig)
+    if (r) r.n++
+    else g.routes.set(sig, { segs: t.segments, n: 1 })
+    g.tags.set(t.tag, (g.tags.get(t.tag) ?? 0) + 1)
+  }
+  return [...groups.values()]
+    .filter((g) => g.count >= 2)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3)
+    .map((g) => {
+      const route = [...g.routes.values()].sort((a, b) => b.n - a.n)[0]
+      const tag = [...g.tags.entries()].sort((a, b) => b[1] - a[1])[0][0] as Tag
+      return {
+        origin: g.origin,
+        destination: g.destination,
+        segments: route.segs,
+        tag,
+        count: g.count,
+      }
+    })
+}
+
 /** Local datetime string for <input type="datetime-local">, defaulting to now. */
 function nowLocal(): string {
   const d = new Date()
@@ -18,12 +67,36 @@ function nowLocal(): string {
 
 export function LogScreen() {
   const complexes = useComplexes()
+  const trips = useLiveQuery(() => db.trips.toArray())
   const [step, setStep] = useState<Step>('origin')
   const [origin, setOrigin] = useState<Complex | null>(null)
   const [destination, setDestination] = useState<Complex | null>(null)
   const [segments, setSegments] = useState<Segment[]>([])
   const [tag, setTag] = useState<Tag>('commute')
   const [when, setWhen] = useState(nowLocal())
+
+  const byId = useMemo(
+    () => (complexes ? new Map(complexes.map((c) => [c.id, c])) : null),
+    [complexes],
+  )
+  const commonTrips = useMemo(
+    () => (trips ? deriveCommonTrips(trips) : []),
+    [trips],
+  )
+
+  /** Prefill the whole trip from a common-trip card and jump to confirm. */
+  function useCommon(ct: CommonTrip) {
+    if (!byId) return
+    const o = byId.get(ct.origin)
+    const d = byId.get(ct.destination)
+    if (!o || !d) return
+    setOrigin(o)
+    setDestination(d)
+    setSegments(ct.segments)
+    setTag(ct.tag)
+    setWhen(nowLocal())
+    setStep('confirm')
+  }
 
   function reset() {
     setOrigin(null)
@@ -66,6 +139,31 @@ export function LogScreen() {
               complex={destination}
               onClick={() => origin && setStep('destination')}
             />
+          </div>
+        )}
+
+        {step === 'origin' && !origin && commonTrips.length > 0 && byId && (
+          <div className="common">
+            <h2 className="common__title">Common trips</h2>
+            {commonTrips.map((ct, i) => {
+              const o = byId.get(ct.origin)
+              const d = byId.get(ct.destination)
+              if (!o || !d) return null
+              return (
+                <button key={i} className="common__card" onClick={() => useCommon(ct)}>
+                  <span className="common__route">
+                    <span className="common__stn">{o.name}</span>
+                    <span className="common__arrow">→</span>
+                    <span className="common__stn">{d.name}</span>
+                  </span>
+                  <span className="common__lines">
+                    {ct.segments.map((s, j) => (
+                      <LineBullet key={j} line={s.line} />
+                    ))}
+                  </span>
+                </button>
+              )
+            })}
           </div>
         )}
 

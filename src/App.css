@@ -526,6 +526,58 @@
   flex: 1;
 }
 
+/* ---- Common trips (quick log) ---- */
+.common {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.common__title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.common__card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.common__route {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.common__arrow {
+  color: var(--text-dim);
+}
+
+.common__lines {
+  display: flex;
+  gap: 3px;
+  font-size: 15px;
+  flex: none;
+}
+
 /* ---- Station search ---- */
 .search {
   display: flex;
@@ -766,12 +818,40 @@
   padding: 6px 0;
 }
 
+.detail__baractions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
 .detail__del {
   border: none;
   background: none;
   color: #ee352e;
   font-size: 15px;
+  font-weight: 700;
   padding: 6px 0;
+}
+
+.detail__edit,
+.detail__save {
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  padding: 6px 0;
+}
+
+.detail__save {
+  color: #4a9eff;
+}
+
+.detail__edit-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 8px 22px 16px;
 }
 
 .detail__head {
@@ -964,20 +1044,26 @@
   flex: none;
 }
 
-.stats__row-name {
+/* Station name + its bullets read as one unit; bullets sit right after the
+   name and wrap underneath if there are many. */
+.stats__row-station {
   flex: 1;
-  font-size: 15px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   min-width: 0;
+}
+
+.stats__row-name {
+  font-size: 15px;
 }
 
 .stats__row-lines {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
   gap: 3px;
-  font-size: 13px;
-  max-width: 45%;
-  flex: none;
+  font-size: 15px;
 }
 
 .stats__row-val {
@@ -1035,6 +1121,55 @@
   width: 70px;
   font-size: 14px;
   text-transform: capitalize;
+  flex: none;
+}
+
+/* Most common trip — station chips with line bullets */
+.stats__common-trip {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 0 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats__common-trip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.stats__common-trip-stations {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stats__stn-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  min-width: 0;
+}
+
+.stats__stn-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.stats__stn-chip .stats__row-lines {
+  justify-content: flex-start;
+  max-width: none;
+  font-size: 14px;
+}
+
+.stats__common-arrow {
+  color: var(--text-dim);
   flex: none;
 }
 

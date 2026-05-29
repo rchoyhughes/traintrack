@@ -1,12 +1,21 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { MapContainer, TileLayer, Polyline, CircleMarker } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { LatLngBoundsExpression } from 'leaflet'
 import { LineBullet } from './LineBullet'
 import { snapSegment, pathMiles } from '../lib/geometry'
 import { lineColor, DIM_GRAY } from '../data/lines'
+import { db } from '../db/db'
+import { TAGS, type Tag } from '../types'
 import type { Complex, Shapes } from '../data/gtfs'
 import type { Trip } from '../types'
+
+/** ISO → value for <input type="datetime-local"> in local time. */
+function toLocalInput(iso: string): string {
+  const d = new Date(iso)
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+  return d.toISOString().slice(0, 16)
+}
 
 /** Detail view for a single logged trip: route timeline, mini-map, mileage. */
 export function TripDetail({
@@ -22,6 +31,24 @@ export function TripDetail({
   onClose: () => void
   onDelete: () => void
 }) {
+  const [editing, setEditing] = useState(false)
+  const [tag, setTag] = useState<Tag>(trip.tag)
+  const [when, setWhen] = useState(toLocalInput(trip.timestamp))
+
+  function startEdit() {
+    setTag(trip.tag)
+    setWhen(toLocalInput(trip.timestamp))
+    setEditing(true)
+  }
+
+  async function saveEdits() {
+    await db.trips.update(trip.id, {
+      tag,
+      timestamp: new Date(when).toISOString(),
+    })
+    setEditing(false)
+  }
+
   const spans = useMemo(
     () =>
       trip.segments
@@ -66,16 +93,60 @@ export function TripDetail({
         <button className="detail__back" onClick={onClose}>
           ← Back
         </button>
-        <button className="detail__del" onClick={onDelete}>
-          Delete
-        </button>
+        {editing ? (
+          <div className="detail__baractions">
+            <button className="detail__back" onClick={() => setEditing(false)}>
+              Cancel
+            </button>
+            <button className="detail__save" onClick={saveEdits}>
+              Save
+            </button>
+          </div>
+        ) : (
+          <div className="detail__baractions">
+            <button className="detail__edit" onClick={startEdit}>
+              Edit
+            </button>
+            <button className="detail__del" onClick={onDelete}>
+              Delete
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="detail__head">
-        <span className="trip-card__tag">{trip.tag}</span>
-        <time>{new Date(trip.timestamp).toLocaleString()}</time>
-        <span className="detail__miles">{miles.toFixed(1)} mi</span>
-      </div>
+      {editing ? (
+        <div className="detail__edit-panel">
+          <div className="confirm__field">
+            <label className="confirm__label">Tag</label>
+            <div className="tags">
+              {TAGS.map((t) => (
+                <button
+                  key={t}
+                  className={`tag${tag === t ? ' is-on' : ''}`}
+                  onClick={() => setTag(t)}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="confirm__field">
+            <label className="confirm__label">When</label>
+            <input
+              className="search__input"
+              type="datetime-local"
+              value={when}
+              onChange={(e) => setWhen(e.target.value)}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="detail__head">
+          <span className="trip-card__tag">{trip.tag}</span>
+          <time>{new Date(trip.timestamp).toLocaleString()}</time>
+          <span className="detail__miles">{miles.toFixed(1)} mi</span>
+        </div>
+      )}
 
       {bounds && (
         <MapContainer

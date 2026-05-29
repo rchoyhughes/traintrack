@@ -191,8 +191,10 @@ export function StatsScreen() {
           {shownStations.map((s, i) => (
             <div className="stats__row" key={s.complex!.id}>
               <span className="stats__rank">{i + 1}</span>
-              <span className="stats__row-name">{s.complex!.name}</span>
-              <StationLines complex={s.complex!} />
+              <div className="stats__row-station">
+                <span className="stats__row-name">{s.complex!.name}</span>
+                <StationLines complex={s.complex!} />
+              </div>
               <span className="stats__row-val">{s.n}</span>
             </div>
           ))}
@@ -232,8 +234,10 @@ export function StatsScreen() {
           <Section title="Top transfer hubs">
             {stats.topTransfers.map((s) => (
               <div className="stats__row" key={s.complex!.id}>
-                <span className="stats__row-name">{s.complex!.name}</span>
-                <StationLines complex={s.complex!} />
+                <div className="stats__row-station">
+                  <span className="stats__row-name">{s.complex!.name}</span>
+                  <StationLines complex={s.complex!} />
+                </div>
                 <span className="stats__row-val">{s.n}</span>
               </div>
             ))}
@@ -242,13 +246,23 @@ export function StatsScreen() {
 
         {/* Patterns. */}
         <Section title="Your patterns">
-          {stats.topPair && (
-            <div className="stats__fact">
-              <span className="stats__fact-label">Most common trip</span>
-              <span className="stats__fact-value">
-                {stats.topPair.a?.name} ↔ {stats.topPair.b?.name}
-                <span className="stats__fact-sub"> · {stats.topPair.n}×</span>
-              </span>
+          {stats.topPair && stats.topPair.a && stats.topPair.b && (
+            <div className="stats__common-trip">
+              <div className="stats__common-trip-head">
+                <span className="stats__fact-label">Most common trip</span>
+                <span className="stats__fact-sub">{stats.topPair.n}×</span>
+              </div>
+              <div className="stats__common-trip-stations">
+                <span className="stats__stn-chip">
+                  <span className="stats__stn-name">{stats.topPair.a.name}</span>
+                  <StationLines complex={stats.topPair.a} />
+                </span>
+                <span className="stats__common-arrow">↔</span>
+                <span className="stats__stn-chip">
+                  <span className="stats__stn-name">{stats.topPair.b.name}</span>
+                  <StationLines complex={stats.topPair.b} />
+                </span>
+              </div>
             </div>
           )}
           <div className="stats__fact">
