@@ -3,6 +3,7 @@
  * served from /gtfs/ and cached by the service worker). Fetched once and
  * memoized in-memory.
  */
+import { COMPLEX_NAMES } from './complexNames'
 
 export interface Station {
   /** GTFS stop id (parent station). */
@@ -63,7 +64,7 @@ export function groupComplexes(stations: Station[]): Complex[] {
     const lines = [...new Set(members.flatMap((m) => m.lines))].sort()
     complexes.push({
       id,
-      name: members[0].name,
+      name: COMPLEX_NAMES[id] ?? members[0].name,
       borough: members[0].borough,
       stationIds: members.map((m) => m.id),
       lines,

@@ -13,12 +13,9 @@ export function StatsScreen() {
   const lineCount = trips
     ? new Set(trips.flatMap((t) => t.segments.map((s) => s.line))).size
     : 0
+  // Visited = stations entered or exited (trip origin/destination).
   const stationCount = trips
-    ? new Set(
-        trips.flatMap((t) =>
-          t.segments.flatMap((s) => [s.origin, s.destination]),
-        ),
-      ).size
+    ? new Set(trips.flatMap((t) => [t.origin, t.destination])).size
     : 0
 
   return (

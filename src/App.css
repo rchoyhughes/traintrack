@@ -197,6 +197,28 @@
   padding: 4px 0;
 }
 
+/* Out-of-station transfer option in the boarding step. */
+.builder__oost {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  margin-top: 4px;
+  border-top: 1px dashed var(--border);
+}
+
+.builder__oost-label {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* OOST walk marker inside the progress chain. */
+.builder__walk {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
 /* ---- Confirm step ---- */
 .confirm {
   display: flex;

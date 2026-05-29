@@ -35,9 +35,12 @@ export function LogScreen() {
   }
 
   async function save() {
+    if (!origin || !destination) return
     await db.trips.add({
       id: crypto.randomUUID(),
       timestamp: new Date(when).toISOString(),
+      origin: origin.id,
+      destination: destination.id,
       segments,
       tag,
     })

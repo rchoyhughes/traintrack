@@ -38,6 +38,13 @@ export interface Trip {
   id: string
   /** ISO 8601. Defaults to now; backdating allowed. */
   timestamp: string
+  /**
+   * The stations entered and exited (complex ids) — the "visited" stations.
+   * Distinct from segment endpoints, which may be transfer-only points
+   * (including out-of-station transfer walk-throughs).
+   */
+  origin: string
+  destination: string
   segments: Segment[]
   tag: Tag
   notes?: string
