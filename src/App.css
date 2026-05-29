@@ -1,9 +1,9 @@
 .app {
   display: flex;
   flex-direction: column;
-  /* dvh (dynamic viewport) is correct in an installed iOS PWA; svh there is
-     measured against a phantom Safari toolbar, leaving dead space. */
-  height: 100dvh;
+  /* JS-driven height (--app-height) — reliable on iOS PWA cold start, where
+     CSS dvh can resolve stale. Falls back to dvh before JS runs. */
+  height: var(--app-height, 100dvh);
   position: relative;
   overflow: hidden;
 }
