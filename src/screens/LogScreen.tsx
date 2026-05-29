@@ -85,7 +85,7 @@ export function LogScreen() {
   )
 
   /** Prefill the whole trip from a common-trip card and jump to confirm. */
-  function useCommon(ct: CommonTrip) {
+  function applyCommonTrip(ct: CommonTrip) {
     if (!byId) return
     const o = byId.get(ct.origin)
     const d = byId.get(ct.destination)
@@ -150,7 +150,7 @@ export function LogScreen() {
               const d = byId.get(ct.destination)
               if (!o || !d) return null
               return (
-                <button key={i} className="common__card" onClick={() => useCommon(ct)}>
+                <button key={i} className="common__card" onClick={() => applyCommonTrip(ct)}>
                   <span className="common__route">
                     <span className="common__stn">{o.name}</span>
                     <span className="common__arrow">→</span>

@@ -14,8 +14,6 @@
   --text-dim: #9a9aa0;
   --accent: #0039a6; /* IND blue, used for primary actions */
 
-  --tab-h: 56px;
-
   font-family: var(--font);
   font-size: 16px;
   line-height: 1.4;

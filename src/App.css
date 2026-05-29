@@ -796,11 +796,6 @@
 }
 
 /* ---- Trip detail ---- */
-.detail {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
 
 .detail__bar {
   display: flex;

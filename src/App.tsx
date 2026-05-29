@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { TabBar, type TabId } from './components/TabBar'
 import { AppHeader } from './components/AppHeader'
 import { MenuSheet } from './components/MenuSheet'
@@ -24,14 +24,10 @@ function App() {
   const [tab, setTab] = useState<TabId>('log')
   const [menuOpen, setMenuOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
-  const [installOpen, setInstallOpen] = useState(false)
-
-  // First web visit (not installed, not dismissed) → show the install guide.
-  useEffect(() => {
-    if (!isStandalone() && !localStorage.getItem(INSTALL_DISMISSED)) {
-      setInstallOpen(true)
-    }
-  }, [])
+  // Show the install guide on a first web visit (not installed, not dismissed).
+  const [installOpen, setInstallOpen] = useState(
+    () => !isStandalone() && !localStorage.getItem(INSTALL_DISMISSED),
+  )
 
   function closeInstall() {
     setInstallOpen(false)

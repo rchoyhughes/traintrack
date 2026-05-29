@@ -219,14 +219,14 @@ function Chain({
   segments: Segment[]
   byId: Map<string, Complex>
 }) {
-  let pos = origin.id
   return (
     <div className="builder__chain">
       <span className="builder__node">{origin.name}</span>
       {segments.map((s, i) => {
-        const walked = s.origin !== pos
+        // Walked = boarded somewhere other than the previous stop (OOST).
+        const prevDest = i === 0 ? origin.id : segments[i - 1].destination
+        const walked = s.origin !== prevDest
         const boardName = byId.get(s.origin)?.name
-        pos = s.destination
         return (
           <span key={i} className="builder__leg">
             {walked && (

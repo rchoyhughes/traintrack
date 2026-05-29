@@ -16,6 +16,27 @@ You log a trip by picking an origin and destination station, then either selecti
 
 ---
 
+## Status (built)
+
+Deployed and in daily use at **traintrack.harmo.nyc**.
+
+- ✅ GTFS pipeline → bundled station/complex/shape JSON (multi-path geometry:
+  bridge/tunnel variants, branches)
+- ✅ Station search (fuzzy, complex-grouped, favorites)
+- ✅ Manual route builder — transfers, out-of-station transfers, off-peak
+  service (daytime lines for display / all lines for routing), reroute
+  fallback, distinct shuttle bullets (S / Sꜰ / Sʀ)
+- ✅ Trip logging — tags, backdating, edit time/tag, common-trip quick-log
+- ✅ History with detail view (route timeline, mini-map, track mileage)
+- ✅ Geographic map: frequency-weighted glowing overlay
+- ✅ Stats: distance, coverage, top stations, lines, transfer hubs, patterns
+- ✅ Local-first storage, JSON export/import, About/privacy, install walkthrough
+- ✅ Floating-glass nav shell; PWA; deployed via GitHub Actions + nginx/TLS
+
+Parked / planned: see §10.
+
+---
+
 ## 2. Architecture
 
 ```
@@ -60,10 +81,10 @@ You log a trip by picking an origin and destination station, then either selecti
 | Framework | React | Standard, huge ecosystem, mature integrations |
 | Local DB | Dexie.js (IndexedDB) | Structured, queryable, reactive via `dexie-react-hooks` |
 | Map | Leaflet + `react-leaflet` | Geographic, GTFS shapes as polylines |
-| Visualizations | D3 | Computed live from IndexedDB |
-| Routing | Google Directions API | `alternatives=true`, `transit_mode=subway`, proxied |
-| Proxy | Express/Fastify, single endpoint | Forwards to Google, returns results |
-| Hosting | Oracle Cloud Always Free | Static build + proxy on one box |
+| Visualizations | Dependency-free CSS | Computed live from IndexedDB (D3 proved unnecessary) |
+| Routing | Manual builder (built); Google Directions proxy (planned) | Manual route building covers everything today |
+| Hosting | Oracle Cloud (nginx + Let's Encrypt) | Static build at traintrack.harmo.nyc |
+| CI/CD | GitHub Actions | Push to `main` → build → rsync to server; monthly GTFS refresh PR |
 
 **Typography:** `"Helvetica Neue", Helvetica, Arial, sans-serif`. True Helvetica on Apple devices; Arial is a near-identical fallback elsewhere.
 
@@ -130,12 +151,19 @@ GTFS changes rarely (a few stations per decade). Rebundle and redeploy when it e
 
 ## 6. Navigation
 
-Bottom tab bar (mobile-first):
+A branded top header (TrainTrack wordmark + `•••` menu) and a floating,
+translucent "liquid glass" bottom nav pill (chosen over plain bottom tabs,
+which felt dated and rendered poorly as an iOS PWA):
 
-- **Log** (default) — the trip logging flow
-- **History** — list of past trips; tap to view, swipe/delete to remove (no editing — delete and re-log to fix)
+- **Log** (default) — the trip logging flow; surfaces "Common trips" for
+  two-tap re-logging of frequent journeys
+- **History** — list of past trips; tap for a detail view (route timeline,
+  mini-map, mileage); edit time/tag or delete from there
 - **Map** — the geographic centerpiece
 - **Stats** — derived analytics
+
+The header `•••` menu opens a bottom sheet: Export data, Import data, Add to
+Home Screen (install walkthrough), and About & privacy.
 
 ---
 
@@ -167,6 +195,9 @@ Geographic Leaflet map grounded in real station coordinates, emphasizing explore
 
 ## 10. Parked for Later
 
+- **Google Directions proxy** — auto-suggest routes (ranked under your history)
+  so manual building becomes the exception, not the default.
+- **App icons** — real `icon-192/512.png` for the PWA manifest.
 - **Exploration score** — composite metric weighting coverage by uniqueness. Concept is appealing but undefined; revisit. For now, station/line coverage percentages stand on their own.
 - **Cross-device sync** — currently each device is its own history. Could later add optional sync with user-held encryption key, server storing only opaque blobs.
 - **Service disruption context** — correlating odd routes with MTA service alerts for narrative.
