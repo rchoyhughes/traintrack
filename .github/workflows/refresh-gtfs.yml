@@ -1,0 +1,50 @@
+name: Refresh GTFS data
+
+# Rebuilds the bundled GTFS data from the live MTA feed and opens a PR if it
+# changed — a review gate, since curated overrides (COMPLEX_NAMES, OOST pairs,
+# shuttle handling) are keyed to complex/route IDs that could shift.
+on:
+  schedule:
+    - cron: '0 8 1 * *' # 08:00 UTC, 1st of each month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Rebuild GTFS data from the MTA feed
+        run: npm run gtfs
+
+      - name: Open a PR if the data changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: public/gtfs/*.json
+          branch: gtfs-refresh
+          delete-branch: true
+          commit-message: Refresh GTFS data from MTA feed
+          title: Refresh GTFS data
+          body: |
+            Automated monthly refresh of the bundled GTFS data
+            (`public/gtfs/stations.json`, `public/gtfs/shapes.json`) from the
+            MTA feed.
+
+            **Review the diff before merging.** In particular, confirm the
+            curated overrides still line up in case the MTA changed any
+            complex or route IDs:
+            - `COMPLEX_NAMES` (multi-name complex display names)
+            - out-of-station transfer pairs in `transfers.ts`
+            - shuttle normalization (GS→S; FS / H kept distinct)
