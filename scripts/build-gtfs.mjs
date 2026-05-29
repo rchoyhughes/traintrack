@@ -199,17 +199,26 @@ function buildStations(stationsPath, stationRoutes) {
   return stations
 }
 
-// ---- build shapes.json: representative geometry per route ----
+// ---- build shapes.json: distinct geometry per route ----
+// "Longest shape per direction" would drop alternate paths (N/Q bridge vs
+// tunnel, the A's Lefferts/Rockaway branches, etc.). Instead, per route we
+// greedily keep shapes that add genuinely new track via coverage dedup:
+// process longest-first, keep a shape only if it covers enough cells not
+// already covered. Short-turns (fully overlapping) are dropped; alternate
+// paths and branches (which add a chunk of new track) are kept.
+const SHAPE_CELL = 3 // lat/lon decimals → ~100m grid
+const MIN_NEW_CELLS = 8 // ~a few hundred meters of distinct track to keep
+
+const cellOf = ([lat, lon]) =>
+  `${lat.toFixed(SHAPE_CELL)},${lon.toFixed(SHAPE_CELL)}`
+
 function buildShapes(gtfsDir) {
-  // shape_id -> { route, dir } from trips.txt
+  // shape_id -> route_id from trips.txt
   const trips = parseRecords(readFileSync(join(gtfsDir, 'trips.txt'), 'utf8'))
-  const shapeMeta = new Map()
+  const shapeRoute = new Map()
   for (const t of trips) {
-    if (t.shape_id && !shapeMeta.has(t.shape_id)) {
-      shapeMeta.set(t.shape_id, {
-        route: t.route_id,
-        dir: t.direction_id,
-      })
+    if (t.shape_id && !shapeRoute.has(t.shape_id)) {
+      shapeRoute.set(t.shape_id, t.route_id)
     }
   }
 
@@ -228,26 +237,32 @@ function buildShapes(gtfsDir) {
     })
   }
 
-  // Pick the longest shape per (route, direction) as representative geometry.
-  // key: `${route}|${dir}` -> { len, coords }
-  const best = new Map()
+  // route_id -> array of distinct polylines (ordered coords)
+  const routeShapes = new Map()
   for (const [id, pts] of points) {
-    const meta = shapeMeta.get(id)
-    if (!meta) continue
+    const route = shapeRoute.get(id)
+    if (!route) continue
     pts.sort((a, b) => a.seq - b.seq)
     const coords = pts.map((p) => [p.lat, p.lon])
-    const key = `${meta.route}|${meta.dir}`
-    const prev = best.get(key)
-    if (!prev || coords.length > prev.coords.length) {
-      best.set(key, { route: meta.route, coords })
-    }
+    if (!routeShapes.has(route)) routeShapes.set(route, [])
+    routeShapes.get(route).push(coords)
   }
 
-  // route_id -> array of polylines
   const byRoute = {}
-  for (const { route, coords } of best.values()) {
-    if (!byRoute[route]) byRoute[route] = []
-    byRoute[route].push(coords)
+  for (const [route, shapes] of routeShapes) {
+    shapes.sort((a, b) => b.length - a.length) // longest first
+    const covered = new Set()
+    const kept = []
+    for (const coords of shapes) {
+      const cells = new Set(coords.map(cellOf))
+      let newCount = 0
+      for (const c of cells) if (!covered.has(c)) newCount++
+      if (kept.length === 0 || newCount >= MIN_NEW_CELLS) {
+        kept.push(coords)
+        for (const c of cells) covered.add(c)
+      }
+    }
+    byRoute[route] = kept
   }
   return byRoute
 }
