@@ -48,7 +48,8 @@ body {
 #root {
   display: flex;
   flex-direction: column;
-  min-height: var(--app-height, 100dvh);
+  min-height: 100dvh;
+  min-height: 100lvh;
   max-width: 640px;
   margin: 0 auto;
 }

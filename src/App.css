@@ -1,9 +1,12 @@
 .app {
   display: flex;
   flex-direction: column;
-  /* JS-driven height (--app-height) — reliable on iOS PWA cold start, where
-     CSS dvh can resolve stale. Falls back to dvh before JS runs. */
-  height: var(--app-height, 100dvh);
+  /* lvh = large viewport (browser UI hidden) = full screen in a standalone
+     PWA. Unlike dvh, it doesn't track the transient too-short viewport iOS
+     reports on cold start, and the keyboard (a visual-viewport change) can't
+     shrink it. dvh is the fallback for browsers without lvh. */
+  height: 100dvh;
+  height: 100lvh;
   position: relative;
   overflow: hidden;
 }

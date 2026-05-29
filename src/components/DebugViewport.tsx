@@ -9,20 +9,26 @@ export function DebugViewport() {
   const [text, setText] = useState('')
 
   useEffect(() => {
+    // Measure a CSS viewport unit by probing a hidden element.
+    const probe = (unit: string) => {
+      const d = document.createElement('div')
+      d.style.cssText = `position:fixed;top:0;left:0;width:0;height:100${unit};visibility:hidden;pointer-events:none;`
+      document.body.appendChild(d)
+      const h = d.clientHeight
+      d.remove()
+      return h
+    }
     const update = () => {
       const vv = window.visualViewport
-      const appH = getComputedStyle(document.documentElement)
-        .getPropertyValue('--app-height')
-        .trim()
+      const app = document.querySelector('.app')
       setText(
         [
           `iH:${window.innerHeight}`,
           `vvH:${vv ? Math.round(vv.height) : '-'}`,
-          `vvTop:${vv ? Math.round(vv.offsetTop) : '-'}`,
-          `clH:${document.documentElement.clientHeight}`,
-          `bodyH:${document.body.clientHeight}`,
-          `sY:${Math.round(window.scrollY)}`,
-          `app:${appH}`,
+          `svh:${probe('svh')}`,
+          `dvh:${probe('dvh')}`,
+          `lvh:${probe('lvh')}`,
+          `appH:${app ? Math.round(app.getBoundingClientRect().height) : '-'}`,
         ].join('  '),
       )
     }
