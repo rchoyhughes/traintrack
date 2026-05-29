@@ -5,6 +5,7 @@ import { LineBullet } from '../components/LineBullet'
 import { TripDetail } from '../components/TripDetail'
 import { useComplexes } from '../data/useComplexes'
 import { loadShapes, type Shapes } from '../data/gtfs'
+import { formatTripTime } from '../lib/datetime'
 
 /**
  * List of past trips, newest first. Tap a trip for its detail (route
@@ -56,7 +57,7 @@ export function HistoryScreen() {
                   </div>
                   <div className="trip-card__meta">
                     <span className="trip-card__tag">{trip.tag}</span>
-                    <time>{new Date(trip.timestamp).toLocaleString()}</time>
+                    <time>{formatTripTime(trip.timestamp)}</time>
                   </div>
                 </button>
               </li>

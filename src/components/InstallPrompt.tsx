@@ -3,7 +3,10 @@
  * (when not already installed), and can be reopened from the menu. Also warns
  * that data is per-install, so trips don't silently get stranded.
  */
+import { useRegisterOverlay } from './overlay'
+
 export function InstallPrompt({ onClose }: { onClose: () => void }) {
+  useRegisterOverlay('install')
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
 
   return (

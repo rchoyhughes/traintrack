@@ -6,6 +6,8 @@ import { LineBullet } from './LineBullet'
 import { snapSegment, pathMiles } from '../lib/geometry'
 import { lineColor, DIM_GRAY } from '../data/lines'
 import { db } from '../db/db'
+import { useRegisterOverlay } from './overlay'
+import { formatTripTime } from '../lib/datetime'
 import { TAGS, type Tag } from '../types'
 import type { Complex, Shapes } from '../data/gtfs'
 import type { Trip } from '../types'
@@ -31,6 +33,7 @@ export function TripDetail({
   onClose: () => void
   onDelete: () => void
 }) {
+  useRegisterOverlay('trip-detail')
   const [editing, setEditing] = useState(false)
   const [tag, setTag] = useState<Tag>(trip.tag)
   const [when, setWhen] = useState(toLocalInput(trip.timestamp))
@@ -143,7 +146,7 @@ export function TripDetail({
       ) : (
         <div className="detail__head">
           <span className="trip-card__tag">{trip.tag}</span>
-          <time>{new Date(trip.timestamp).toLocaleString()}</time>
+          <time>{formatTripTime(trip.timestamp)}</time>
           <span className="detail__miles">{miles.toFixed(1)} mi</span>
         </div>
       )}

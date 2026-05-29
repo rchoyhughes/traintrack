@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { downloadBackup, restoreBackup } from '../lib/dataTransfer'
+import { useRegisterOverlay } from './overlay'
 
 /** Bottom sheet opened from the header menu: data + About + install help. */
 export function MenuSheet({
@@ -12,6 +13,7 @@ export function MenuSheet({
   onInstallHelp: () => void
 }) {
   const fileRef = useRef<HTMLInputElement>(null)
+  useRegisterOverlay('menu')
 
   async function onImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]

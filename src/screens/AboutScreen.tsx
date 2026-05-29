@@ -1,5 +1,8 @@
+import { useRegisterOverlay } from '../components/overlay'
+
 /** About + privacy. Opened from the menu; full-screen overlay. */
 export function AboutScreen({ onClose }: { onClose: () => void }) {
+  useRegisterOverlay('about')
   return (
     <div className="fullscreen">
       <div className="detail__bar">
@@ -37,6 +40,7 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
         </p>
 
         <p className="about__foot">Made for the love of the subway. 🚇</p>
+        <p className="about__version">Build {__APP_VERSION__}</p>
       </div>
     </div>
   )
