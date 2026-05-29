@@ -48,10 +48,18 @@ body {
 #root {
   display: flex;
   flex-direction: column;
+  /* dvh in a browser (matches .app, keeps the page from running taller than the
+     visible viewport under Safari's toolbar); lvh only in standalone PWA. */
+  min-height: 100vh;
   min-height: 100dvh;
-  min-height: 100lvh;
   max-width: 640px;
   margin: 0 auto;
+}
+
+@media (display-mode: standalone) {
+  #root {
+    min-height: 100lvh;
+  }
 }
 
 h1,
