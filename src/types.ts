@@ -19,11 +19,11 @@ export const TAGS: Tag[] = [
 ]
 
 /**
- * One unbroken ride on a single line. A transfer is implicit: when one
- * segment's `destination` connects to the next segment's `origin`
- * (same station, or same complex).
+ * One unbroken ride on a single line. A transfer is implicit: one segment's
+ * `destination` is the next segment's `origin`.
  *
- * `origin` / `destination` are GTFS stop IDs.
+ * `origin` / `destination` are station *complex* ids (the unit the user
+ * picks and the unit counted as "visited").
  * `line` is the route short name (e.g. "Q", "2", "7").
  */
 export interface Segment {

@@ -116,6 +116,156 @@
   padding: 12px 20px;
 }
 
+.btn--ghost {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* ---- Route builder ---- */
+.builder {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.builder__chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  background: var(--surface);
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.builder__leg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.builder__node {
+  color: var(--text-dim);
+}
+
+.builder__node:last-child {
+  color: var(--text);
+}
+
+.builder__prompt {
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.builder__prompt .bullet {
+  vertical-align: middle;
+  font-size: 15px;
+}
+
+.builder__lines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 24px;
+}
+
+.builder__linebtn {
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.builder__arrive {
+  border: none;
+  border-radius: 10px;
+  background: #00933c;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 14px;
+  text-align: left;
+}
+
+.builder__undo {
+  align-self: flex-start;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-size: 14px;
+  padding: 4px 0;
+}
+
+/* ---- Confirm step ---- */
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.route-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.route-summary__leg {
+  display: inline-flex;
+  font-size: 16px;
+}
+
+.confirm__field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.confirm__label {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-dim);
+  font-size: 14px;
+  text-transform: capitalize;
+  padding: 8px 16px;
+}
+
+.tag.is-on {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+  font-weight: 700;
+}
+
+.confirm__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm__actions .btn {
+  flex: 1;
+}
+
 /* ---- Station search ---- */
 .search {
   display: flex;
