@@ -189,6 +189,7 @@ export function LogScreen() {
         {step === 'destination' && (
           <StationSearch
             label="Where did you end up?"
+            autoFocus
             onSelect={(c) => {
               setDestination(c)
               setSegments([])
