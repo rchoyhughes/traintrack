@@ -7,6 +7,8 @@ import { lineColor, ALL_LINES } from '../data/lines'
 import { snapSegment, pathMiles } from '../lib/geometry'
 import { useCountUp } from '../lib/useCountUp'
 import { LineBullet } from '../components/LineBullet'
+import { RangeFilter } from '../components/RangeFilter'
+import { filterTripsByRange, type TimeRange } from '../lib/timeRange'
 
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const BOROUGHS: [string, string][] = [
@@ -23,8 +25,18 @@ function fmtHour(h: number): string {
   return `${hr} ${ampm}`
 }
 
-export function StatsScreen() {
-  const trips = useLiveQuery(() => db.trips.toArray())
+export function StatsScreen({
+  range,
+  onRangeChange,
+}: {
+  range: TimeRange
+  onRangeChange: (range: TimeRange) => void
+}) {
+  const allTrips = useLiveQuery(() => db.trips.toArray())
+  const trips = useMemo(
+    () => (allTrips ? filterTripsByRange(allTrips, range) : undefined),
+    [allTrips, range],
+  )
   const complexes = useComplexes()
   const [shapes, setShapes] = useState<Shapes | null>(null)
   const [showAllStations, setShowAllStations] = useState(false)
@@ -140,8 +152,9 @@ export function StatsScreen() {
   if (!stats) {
     return (
       <div className="screen">
-        <header className="screen__header">
+        <header className="screen__header screen__header--row">
           <h1>Stats</h1>
+          <RangeFilter value={range} onChange={onRangeChange} />
         </header>
         <div className="screen__body">
           <p className="placeholder__note">Crunching your trips…</p>
@@ -153,12 +166,15 @@ export function StatsScreen() {
   if (stats.trips === 0) {
     return (
       <div className="screen">
-        <header className="screen__header">
+        <header className="screen__header screen__header--row">
           <h1>Stats</h1>
+          <RangeFilter value={range} onChange={onRangeChange} />
         </header>
         <div className="screen__body">
           <p className="placeholder__note">
-            Log some trips and your stats will appear here.
+            {range === 'all'
+              ? 'Log some trips and your stats will appear here.'
+              : 'No trips in this range. Try a longer time span.'}
           </p>
         </div>
       </div>
@@ -176,8 +192,9 @@ export function StatsScreen() {
 
   return (
     <div className="screen">
-      <header className="screen__header">
+      <header className="screen__header screen__header--row">
         <h1>Stats</h1>
+        <RangeFilter value={range} onChange={onRangeChange} />
       </header>
       <div className="screen__body stats">
         {/* Hero: total distance. */}
