@@ -17,9 +17,14 @@ const BOROUGH: Record<string, string> = {
 export function StationSearch({
   label,
   onSelect,
+  autoFocus = false,
 }: {
   label: string
   onSelect: (complex: Complex) => void
+  /** Focus the input on mount. Off by default so opening the Log screen
+      doesn't force the keyboard open; enabled for mid-flow steps the user
+      reaches by tapping (e.g. the destination search). */
+  autoFocus?: boolean
 }) {
   const [query, setQuery] = useState('')
   const complexes = useComplexes()
@@ -53,7 +58,7 @@ export function StationSearch({
         className="search__input"
         type="search"
         inputMode="search"
-        autoFocus
+        autoFocus={autoFocus}
         placeholder="Search stations…"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
