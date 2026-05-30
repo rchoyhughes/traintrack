@@ -66,8 +66,50 @@
   padding: 16px 20px 12px;
 }
 
+/* Title on the left, time-range filter on the right. */
+.screen__header--row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .screen__header h1 {
   font-size: 28px;
+}
+
+/* ---- Time-range filter (Map / History / Stats) ---- */
+.range-filter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+
+.range-filter__select {
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 32px 7px 14px;
+  outline: none;
+}
+
+.range-filter__select:focus-visible {
+  border-color: var(--text-dim);
+}
+
+.range-filter__chevron {
+  position: absolute;
+  right: 13px;
+  font-size: 11px;
+  color: var(--text-dim);
+  pointer-events: none;
 }
 
 .screen__body {

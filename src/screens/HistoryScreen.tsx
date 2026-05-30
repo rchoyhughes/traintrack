@@ -6,13 +6,21 @@ import { TripDetail } from '../components/TripDetail'
 import { useComplexes } from '../data/useComplexes'
 import { loadShapes, type Shapes } from '../data/gtfs'
 import { formatTripTime } from '../lib/datetime'
+import { RangeFilter } from '../components/RangeFilter'
+import { filterTripsByRange, type TimeRange } from '../lib/timeRange'
 
 /**
  * List of past trips, newest first. Tap a trip for its detail (route
  * timeline + mini-map + mileage); delete removes it (no editing).
  */
-export function HistoryScreen() {
-  const trips = useLiveQuery(() =>
+export function HistoryScreen({
+  range,
+  onRangeChange,
+}: {
+  range: TimeRange
+  onRangeChange: (range: TimeRange) => void
+}) {
+  const allTrips = useLiveQuery(() =>
     db.trips.orderBy('timestamp').reverse().toArray(),
   )
   const complexes = useComplexes()
@@ -28,19 +36,29 @@ export function HistoryScreen() {
     [complexes],
   )
 
+  const trips = useMemo(
+    () => (allTrips ? filterTripsByRange(allTrips, range) : undefined),
+    [allTrips, range],
+  )
+
   const selected = trips?.find((t) => t.id === selectedId) ?? null
 
   return (
     <div className="screen">
-      <header className="screen__header">
+      <header className="screen__header screen__header--row">
         <h1>History</h1>
+        <RangeFilter value={range} onChange={onRangeChange} />
       </header>
       <div className="screen__body">
         {trips === undefined ? (
           <p className="placeholder__note">Loading…</p>
-        ) : trips.length === 0 ? (
+        ) : allTrips && allTrips.length === 0 ? (
           <p className="placeholder__note">
             No trips logged yet. Head to the Log tab to add your first.
+          </p>
+        ) : trips.length === 0 ? (
+          <p className="placeholder__note">
+            No trips in this range. Try a longer time span.
           </p>
         ) : (
           <ul className="trip-list">
