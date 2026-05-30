@@ -1,10 +1,11 @@
 /** Time-range lens shared by the Map, History, and Stats screens. */
 
-export type TimeRange = 'all' | 'week' | 'month' | 'year'
+export type TimeRange = 'all' | 'day' | 'week' | 'month' | 'year'
 
 /** Options in display order; "All time" leads since it's the default. */
 export const TIME_RANGES: { id: TimeRange; label: string }[] = [
   { id: 'all', label: 'All time' },
+  { id: 'day', label: 'Last 24 hours' },
   { id: 'week', label: 'Last week' },
   { id: 'month', label: 'Last month' },
   { id: 'year', label: 'Last year' },
@@ -18,6 +19,9 @@ export const TIME_RANGES: { id: TimeRange; label: string }[] = [
 export function rangeCutoff(range: TimeRange, now: number = Date.now()): number | null {
   const d = new Date(now)
   switch (range) {
+    case 'day':
+      d.setHours(d.getHours() - 24)
+      return d.getTime()
     case 'week':
       d.setDate(d.getDate() - 7)
       return d.getTime()
