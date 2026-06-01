@@ -103,11 +103,11 @@ button {
   flex: none;
 }
 
-/* Shuttle subscript (Franklin "F", Rockaway "R"). */
-.bullet__sub {
+/* Shuttle superscript (Franklin "F", Rockaway "R"). */
+.bullet__sup {
   font-size: 0.55em;
   font-weight: 700;
-  align-self: flex-end;
-  margin-bottom: 0.15em;
+  align-self: flex-start;
+  margin-top: 0.15em;
   margin-left: -0.05em;
 }
