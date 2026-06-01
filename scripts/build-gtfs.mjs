@@ -87,14 +87,15 @@ function parseRecords(text) {
 const round = (n) => Number(Number(n).toFixed(COORD_PRECISION))
 
 /**
- * Normalize a GTFS route_id to its public line label:
- *   express variants  6X→6, 7X→7, FX→F
- *   42 St shuttle      GS→S
- * The Franklin Av (FS) and Rockaway Park (H) shuttles are kept DISTINCT —
- * they have their own bullets (S with an F / R subscript).
+ * Normalize a GTFS route_id to its internal line code:
+ *   express variants     6X→6, 7X→7, FX→F
+ *   42 St shuttle        GS→0
+ *   Franklin Av shuttle  FS→S
+ *   Rockaway shuttle     H→H (unchanged)
  */
 function normalizeRoute(r) {
-  if (r === 'GS') return 'S'
+  if (r === 'GS') return '0'
+  if (r === 'FS') return 'S'
   if (/^[1-9]X$|^FX$/.test(r)) return r.slice(0, -1)
   return r
 }
@@ -184,9 +185,9 @@ function buildStations(stationsPath, stationRoutes) {
       // Full union across all service periods (for the route builder).
       const all = stationRoutes.get(id)
       // Stations.csv labels every shuttle "S"; resolve which one actually
-      // serves this station (Franklin=FS, Rockaway=H, 42 St=S) from the feed.
+      // serves this station (Franklin=S, Rockaway=H, 42 St=0) from the feed.
       if (lines.includes('S') && all) {
-        const shuttle = all.has('FS') ? 'FS' : all.has('H') ? 'H' : 'S'
+        const shuttle = all.has('S') ? 'S' : all.has('H') ? 'H' : '0'
         lines = lines.map((l) => (l === 'S' ? shuttle : l))
       }
       const allLines = all
