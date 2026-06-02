@@ -20,7 +20,7 @@ export function LineBullet({ line }: { line: string }) {
       }}
     >
       {label}
-      {sup && <span className="bullet__sub">{sup}</span>}
+      {sup && <span className="bullet__sup">{sup}</span>}
     </span>
   )
 }

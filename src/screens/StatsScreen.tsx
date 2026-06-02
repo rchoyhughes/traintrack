@@ -5,7 +5,10 @@ import { useComplexes } from '../data/useComplexes'
 import { loadShapes, type Shapes } from '../data/gtfs'
 import { lineColor, ALL_LINES } from '../data/lines'
 import { snapSegment, pathMiles } from '../lib/geometry'
+import { useCountUp } from '../lib/useCountUp'
 import { LineBullet } from '../components/LineBullet'
+import { RangeFilter } from '../components/RangeFilter'
+import { filterTripsByRange, type TimeRange } from '../lib/timeRange'
 
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const BOROUGHS: [string, string][] = [
@@ -22,14 +25,31 @@ function fmtHour(h: number): string {
   return `${hr} ${ampm}`
 }
 
-export function StatsScreen() {
-  const trips = useLiveQuery(() => db.trips.toArray())
+export function StatsScreen({
+  range,
+  onRangeChange,
+}: {
+  range: TimeRange
+  onRangeChange: (range: TimeRange) => void
+}) {
+  const allTrips = useLiveQuery(() => db.trips.toArray())
+  const trips = useMemo(
+    () => (allTrips ? filterTripsByRange(allTrips, range) : undefined),
+    [allTrips, range],
+  )
   const complexes = useComplexes()
   const [shapes, setShapes] = useState<Shapes | null>(null)
   const [showAllStations, setShowAllStations] = useState(false)
+  // Flips true just after mount so bars/meters transition from 0 → value.
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     loadShapes().then(setShapes)
+  }, [])
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(id)
   }, [])
 
   const byId = useMemo(
@@ -132,8 +152,9 @@ export function StatsScreen() {
   if (!stats) {
     return (
       <div className="screen">
-        <header className="screen__header">
+        <header className="screen__header screen__header--row">
           <h1>Stats</h1>
+          <RangeFilter value={range} onChange={onRangeChange} />
         </header>
         <div className="screen__body">
           <p className="placeholder__note">Crunching your trips…</p>
@@ -145,12 +166,15 @@ export function StatsScreen() {
   if (stats.trips === 0) {
     return (
       <div className="screen">
-        <header className="screen__header">
+        <header className="screen__header screen__header--row">
           <h1>Stats</h1>
+          <RangeFilter value={range} onChange={onRangeChange} />
         </header>
         <div className="screen__body">
           <p className="placeholder__note">
-            Log some trips and your stats will appear here.
+            {range === 'all'
+              ? 'Log some trips and your stats will appear here.'
+              : 'No trips in this range. Try a longer time span.'}
           </p>
         </div>
       </div>
@@ -168,13 +192,14 @@ export function StatsScreen() {
 
   return (
     <div className="screen">
-      <header className="screen__header">
+      <header className="screen__header screen__header--row">
         <h1>Stats</h1>
+        <RangeFilter value={range} onChange={onRangeChange} />
       </header>
       <div className="screen__body stats">
         {/* Hero: total distance. */}
         <div className="stats__hero">
-          <span className="stats__hero-value">{stats.miles.toFixed(1)}</span>
+          <HeroMiles miles={stats.miles} />
           <span className="stats__hero-unit">miles traveled</span>
         </div>
 
@@ -212,15 +237,16 @@ export function StatsScreen() {
 
         {/* Lines ridden. */}
         <Section title="Lines ridden">
-          {stats.lineList.map(({ line, n }) => (
+          {stats.lineList.map(({ line, n }, i) => (
             <div className="stats__bar-row" key={line}>
               <LineBullet line={line} />
               <div className="stats__bar-track">
                 <div
                   className="stats__bar-fill"
                   style={{
-                    width: `${(n / maxLine) * 100}%`,
+                    width: mounted ? `${(n / maxLine) * 100}%` : '0%',
                     background: lineColor(line),
+                    transitionDelay: `${i * 0.04}s`,
                   }}
                 />
               </div>
@@ -281,7 +307,11 @@ export function StatsScreen() {
                 <div className="stats__dow-bar-track">
                   <div
                     className="stats__dow-bar"
-                    style={{ height: `${maxDow ? (n / maxDow) * 100 : 0}%` }}
+                    style={{
+                      height:
+                        mounted && maxDow ? `${(n / maxDow) * 100}%` : '0%',
+                      transitionDelay: `${i * 0.04}s`,
+                    }}
                   />
                 </div>
                 <span className="stats__dow-label">{DOW[i][0]}</span>
@@ -295,10 +325,12 @@ export function StatsScreen() {
           <Meter
             label={`Stations · ${stats.uniqueStations} of ${stats.totalStations}`}
             pct={stationPct}
+            mounted={mounted}
           />
           <Meter
             label={`Lines · ${stats.linesRidden} of ${ALL_LINES.length}`}
             pct={linePct}
+            mounted={mounted}
           />
         </Section>
 
@@ -309,6 +341,7 @@ export function StatsScreen() {
               key={b.code}
               label={`${b.name} · ${b.visited} of ${b.total}`}
               pct={b.total ? Math.round((b.visited / b.total) * 100) : 0}
+              mounted={mounted}
             />
           ))}
         </Section>
@@ -321,7 +354,10 @@ export function StatsScreen() {
               <div className="stats__bar-track">
                 <div
                   className="stats__bar-fill"
-                  style={{ width: `${(n / maxTag) * 100}%`, background: '#fff' }}
+                  style={{
+                    width: mounted ? `${(n / maxTag) * 100}%` : '0%',
+                    background: '#fff',
+                  }}
                 />
               </div>
               <span className="stats__row-val">{n}</span>
@@ -344,10 +380,16 @@ function StationLines({ complex }: { complex: { lines: string[] } }) {
   )
 }
 
+function HeroMiles({ miles }: { miles: number }) {
+  const v = useCountUp(miles, 1100)
+  return <span className="stats__hero-value">{v.toFixed(1)}</span>
+}
+
 function Stat({ value, label }: { value: number; label: string }) {
+  const v = useCountUp(value)
   return (
     <div className="stat">
-      <span className="stat__value">{value}</span>
+      <span className="stat__value">{Math.round(v)}</span>
       <span className="stat__label">{label}</span>
     </div>
   )
@@ -368,7 +410,15 @@ function Section({
   )
 }
 
-function Meter({ label, pct }: { label: string; pct: number }) {
+function Meter({
+  label,
+  pct,
+  mounted,
+}: {
+  label: string
+  pct: number
+  mounted: boolean
+}) {
   return (
     <div className="stats__meter">
       <div className="stats__meter-head">
@@ -376,7 +426,10 @@ function Meter({ label, pct }: { label: string; pct: number }) {
         <span className="stats__row-val">{pct}%</span>
       </div>
       <div className="stats__bar-track">
-        <div className="stats__bar-fill" style={{ width: `${pct}%`, background: '#fff' }} />
+        <div
+          className="stats__bar-fill"
+          style={{ width: mounted ? `${pct}%` : '0%', background: '#fff' }}
+        />
       </div>
     </div>
   )

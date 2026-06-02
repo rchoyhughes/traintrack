@@ -12,6 +12,8 @@ import {
 } from '../data/gtfs'
 import { lineColor, DIM_GRAY } from '../data/lines'
 import { snapSegment } from '../lib/geometry'
+import { RangeFilter } from '../components/RangeFilter'
+import { filterTripsByRange, type TimeRange } from '../lib/timeRange'
 
 const NYC_CENTER: [number, number] = [40.7306, -73.9866]
 
@@ -29,15 +31,26 @@ interface RiddenSpan {
  * segments you've ridden light up in their line color and thicken with
  * frequency; stations you've entered or exited glow.
  */
-export function MapScreen() {
+export function MapScreen({
+  range,
+  onRangeChange,
+}: {
+  range: TimeRange
+  onRangeChange: (range: TimeRange) => void
+}) {
   const [shapes, setShapes] = useState<Shapes | null>(null)
   const [complexes, setComplexes] = useState<Complex[] | null>(null)
-  const trips = useLiveQuery(() => db.trips.toArray())
+  const allTrips = useLiveQuery(() => db.trips.toArray())
 
   useEffect(() => {
     loadShapes().then(setShapes)
     loadStations().then((s) => setComplexes(groupComplexes(s)))
   }, [])
+
+  const trips = useMemo(
+    () => (allTrips ? filterTripsByRange(allTrips, range) : undefined),
+    [allTrips, range],
+  )
 
   const byId = useMemo(
     () => (complexes ? new Map(complexes.map((c) => [c.id, c])) : null),
@@ -97,8 +110,9 @@ export function MapScreen() {
 
   return (
     <div className="screen">
-      <header className="screen__header">
+      <header className="screen__header screen__header--row">
         <h1>Map</h1>
+        <RangeFilter value={range} onChange={onRangeChange} />
       </header>
       <div className="screen__body screen__body--bleed">
         {loading ? (

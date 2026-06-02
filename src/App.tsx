@@ -4,6 +4,7 @@ import { AppHeader } from './components/AppHeader'
 import { MenuSheet } from './components/MenuSheet'
 import { InstallPrompt } from './components/InstallPrompt'
 import { OverlayProvider, useOverlayOpen } from './components/overlay'
+import type { TimeRange } from './lib/timeRange'
 import { LogScreen } from './screens/LogScreen'
 import { HistoryScreen } from './screens/HistoryScreen'
 import { MapScreen } from './screens/MapScreen'
@@ -34,6 +35,8 @@ function AppShell() {
   // compositing would otherwise paint them over the overlay).
   const overlayOpen = useOverlayOpen()
   const [tab, setTab] = useState<TabId>('log')
+  // Time-range lens shared across Map/History/Stats. Defaults to all time.
+  const [range, setRange] = useState<TimeRange>('all')
   const [menuOpen, setMenuOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   // Show the install guide on a first web visit (not installed, not dismissed).
@@ -52,9 +55,13 @@ function AppShell() {
 
       <main className="app__content">
         {tab === 'log' && <LogScreen />}
-        {tab === 'history' && <HistoryScreen />}
-        {tab === 'map' && <MapScreen />}
-        {tab === 'stats' && <StatsScreen />}
+        {tab === 'history' && (
+          <HistoryScreen range={range} onRangeChange={setRange} />
+        )}
+        {tab === 'map' && <MapScreen range={range} onRangeChange={setRange} />}
+        {tab === 'stats' && (
+          <StatsScreen range={range} onRangeChange={setRange} />
+        )}
       </main>
 
       {!overlayOpen && <TabBar active={tab} onChange={setTab} />}

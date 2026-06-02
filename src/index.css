@@ -29,6 +29,18 @@
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Respect users who prefer less motion: collapse all animation/transition. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 html,
@@ -48,10 +60,18 @@ body {
 #root {
   display: flex;
   flex-direction: column;
+  /* dvh in a browser (matches .app, keeps the page from running taller than the
+     visible viewport under Safari's toolbar); lvh only in standalone PWA. */
+  min-height: 100vh;
   min-height: 100dvh;
-  min-height: 100lvh;
   max-width: 640px;
   margin: 0 auto;
+}
+
+@media (display-mode: standalone) {
+  #root {
+    min-height: 100lvh;
+  }
 }
 
 h1,
@@ -83,11 +103,11 @@ button {
   flex: none;
 }
 
-/* Shuttle subscript (Franklin "F", Rockaway "R"). */
-.bullet__sub {
+/* Shuttle superscript (Franklin "F", Rockaway "R"). */
+.bullet__sup {
   font-size: 0.55em;
   font-weight: 700;
-  align-self: flex-end;
-  margin-bottom: 0.15em;
+  align-self: flex-start;
+  margin-top: 0.15em;
   margin-left: -0.05em;
 }

@@ -74,6 +74,7 @@ export function LogScreen() {
   const [segments, setSegments] = useState<Segment[]>([])
   const [tag, setTag] = useState<Tag>('commute')
   const [when, setWhen] = useState(nowLocal())
+  const [saved, setSaved] = useState(false)
 
   const byId = useMemo(
     () => (complexes ? new Map(complexes.map((c) => [c.id, c])) : null),
@@ -117,7 +118,11 @@ export function LogScreen() {
       segments,
       tag,
     })
-    reset()
+    setSaved(true)
+    setTimeout(() => {
+      setSaved(false)
+      reset()
+    }, 1600)
   }
 
   return (
@@ -126,6 +131,10 @@ export function LogScreen() {
         <h1>Log a trip</h1>
       </header>
       <div className="screen__body">
+        {saved && destination ? (
+          <TripSaved destination={destination} segments={segments} />
+        ) : (
+          <>
         {(origin || destination) && step !== 'confirm' && (
           <div className="journey">
             <StationChip
@@ -180,6 +189,7 @@ export function LogScreen() {
         {step === 'destination' && (
           <StationSearch
             label="Where did you end up?"
+            autoFocus
             onSelect={(c) => {
               setDestination(c)
               setSegments([])
@@ -243,7 +253,39 @@ export function LogScreen() {
             </div>
           </div>
         )}
+          </>
+        )}
       </div>
+    </div>
+  )
+}
+
+/** Success animation shown briefly after a trip is logged. */
+function TripSaved({
+  destination,
+  segments,
+}: {
+  destination: Complex
+  segments: Segment[]
+}) {
+  return (
+    <div className="saved">
+      <svg className="saved__check" viewBox="0 0 52 52" aria-hidden="true">
+        <circle className="saved__check-ring" cx="26" cy="26" r="23" />
+        <path className="saved__check-mark" d="M15 27 l7 7 l15 -16" />
+      </svg>
+      <div className="saved__route">
+        {segments.map((s, i) => (
+          <span
+            key={i}
+            className="saved__bullet"
+            style={{ animationDelay: `${0.35 + i * 0.09}s` }}
+          >
+            <LineBullet line={s.line} />
+          </span>
+        ))}
+      </div>
+      <p className="saved__text">Logged · {destination.name}</p>
     </div>
   )
 }
