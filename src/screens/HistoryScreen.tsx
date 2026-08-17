@@ -8,6 +8,7 @@ import { loadShapes, type Shapes } from '../data/gtfs'
 import { formatTripTime } from '../lib/datetime'
 import { RangeFilter } from '../components/RangeFilter'
 import { filterTripsByRange, type TimeRange } from '../lib/timeRange'
+import posthog from '../posthog'
 
 /**
  * List of past trips, newest first. Tap a trip for its detail (route
@@ -90,8 +91,12 @@ export function HistoryScreen({
           byId={byId}
           shapes={shapes}
           onClose={() => setSelectedId(null)}
-          onDelete={() => {
-            db.trips.delete(selected.id)
+          onDelete={async () => {
+            await db.trips.delete(selected.id)
+            posthog.capture('trip_deleted', {
+              segment_count: selected.segments.length,
+              tag: selected.tag,
+            })
             setSelectedId(null)
           }}
         />

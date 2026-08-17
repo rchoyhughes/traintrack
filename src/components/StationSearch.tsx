@@ -5,6 +5,7 @@ import { useComplexes } from '../data/useComplexes'
 import { searchComplexes } from '../lib/search'
 import { LineBullet } from './LineBullet'
 import type { Complex } from '../data/gtfs'
+import posthog from '../posthog'
 
 const BOROUGH: Record<string, string> = {
   M: 'Manhattan',
@@ -45,10 +46,12 @@ export function StationSearch({
     return favorites.map((f) => byId.get(f.id)).filter(Boolean) as Complex[]
   }, [complexes, query, favorites])
 
-  function toggleFavorite(id: string, e: React.MouseEvent) {
+  async function toggleFavorite(id: string, e: React.MouseEvent) {
     e.stopPropagation()
-    if (favoriteIds.has(id)) db.favorites.delete(id)
-    else db.favorites.add({ id, addedAt: new Date().toISOString() })
+    const action = favoriteIds.has(id) ? 'removed' : 'added'
+    if (action === 'removed') await db.favorites.delete(id)
+    else await db.favorites.add({ id, addedAt: new Date().toISOString() })
+    posthog.capture('favorite_toggled', { action })
   }
 
   return (

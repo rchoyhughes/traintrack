@@ -20,8 +20,7 @@ build status.
   line distribution, transfer hubs, and personal patterns.
 
 Everything is **local-first**: trips live in your browser via IndexedDB.
-Nothing is sent to a server, no accounts, no tracking. Export/import JSON
-backups from the menu.
+None of your data is sent to a server; analytics collected are anonymous and opt-in. Export/import JSON backups from the menu.
 
 ## Stack
 

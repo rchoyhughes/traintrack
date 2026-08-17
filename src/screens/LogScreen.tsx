@@ -7,6 +7,7 @@ import { useComplexes } from '../data/useComplexes'
 import { db } from '../db/db'
 import { TAGS, type Tag, type Segment } from '../types'
 import type { Complex } from '../data/gtfs'
+import posthog from '../posthog'
 
 type Step = 'origin' | 'destination' | 'route' | 'confirm'
 
@@ -97,6 +98,10 @@ export function LogScreen() {
     setTag(ct.tag)
     setWhen(nowLocal())
     setStep('confirm')
+    posthog.capture('common_trip_selected', {
+      segment_count: ct.segments.length,
+      tag: ct.tag,
+    })
   }
 
   function reset() {
@@ -116,6 +121,10 @@ export function LogScreen() {
       origin: origin.id,
       destination: destination.id,
       segments,
+      tag,
+    })
+    posthog.capture('trip_logged', {
+      segment_count: segments.length,
       tag,
     })
     setSaved(true)

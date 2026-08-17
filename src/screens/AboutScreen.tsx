@@ -19,9 +19,8 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
         <h2 className="about__h2">Your data stays yours</h2>
         <p>
           Every trip you log is stored <strong>only on this device</strong>, in
-          your browser. Nothing is sent to a server, there are no accounts, and
-          there is no analytics or tracking of any kind. We literally cannot see
-          your trips — they never leave your phone.
+          your browser. There are no accounts, and we do not receive your trip
+          details — they never leave your phone.
         </p>
 
         <h2 className="about__h2">Back up your trips</h2>
