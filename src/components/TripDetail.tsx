@@ -11,7 +11,7 @@ import { formatTripTime } from '../lib/datetime'
 import { TAGS, type Tag } from '../types'
 import type { Complex, Shapes } from '../data/gtfs'
 import type { Trip } from '../types'
-import posthog from '../posthog'
+import { capture } from '../posthog'
 
 /** ISO → value for <input type="datetime-local"> in local time. */
 function toLocalInput(iso: string): string {
@@ -50,7 +50,7 @@ export function TripDetail({
       tag,
       timestamp: new Date(when).toISOString(),
     })
-    posthog.capture('trip_updated', { tag })
+    capture('trip_updated', { tag })
     setEditing(false)
   }
 

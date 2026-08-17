@@ -443,6 +443,54 @@
   color: #d6d6da;
 }
 
+/* Row holding a setting label and its toggle. */
+.about__setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.about__setting-label {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* iOS-style switch. */
+.toggle {
+  flex: none;
+  width: 52px;
+  height: 31px;
+  padding: 2px;
+  border: none;
+  border-radius: 999px;
+  background: var(--surface-2);
+  transition: background 0.15s ease;
+}
+
+.toggle--on {
+  background: var(--accent);
+}
+
+.toggle__knob {
+  display: block;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  transform: translateX(0);
+  transition: transform 0.15s ease;
+}
+
+.toggle--on .toggle__knob {
+  transform: translateX(21px);
+}
+
 .about__foot {
   margin-top: 26px;
   color: var(--text-dim);

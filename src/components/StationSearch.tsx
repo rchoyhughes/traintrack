@@ -5,7 +5,7 @@ import { useComplexes } from '../data/useComplexes'
 import { searchComplexes } from '../lib/search'
 import { LineBullet } from './LineBullet'
 import type { Complex } from '../data/gtfs'
-import posthog from '../posthog'
+import { capture } from '../posthog'
 
 const BOROUGH: Record<string, string> = {
   M: 'Manhattan',
@@ -51,7 +51,7 @@ export function StationSearch({
     const action = favoriteIds.has(id) ? 'removed' : 'added'
     if (action === 'removed') await db.favorites.delete(id)
     else await db.favorites.add({ id, addedAt: new Date().toISOString() })
-    posthog.capture('favorite_toggled', { action })
+    capture('favorite_toggled', { action })
   }
 
   return (

@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { downloadBackup, restoreBackup } from '../lib/dataTransfer'
 import { useRegisterOverlay } from './overlay'
-import posthog from '../posthog'
+import { capture } from '../posthog'
 
 /** Bottom sheet opened from the header menu: data + About + install help. */
 export function MenuSheet({
@@ -29,7 +29,7 @@ export function MenuSheet({
     }
     try {
       const n = await restoreBackup(file)
-      posthog.capture('backup_imported', { trip_count: n })
+      capture('backup_imported', { trip_count: n })
       alert(`Imported ${n} trip${n === 1 ? '' : 's'}.`)
       onClose()
     } catch (err) {
@@ -46,7 +46,7 @@ export function MenuSheet({
           className="sheet__item"
           onClick={async () => {
             await downloadBackup()
-            posthog.capture('backup_exported')
+            capture('backup_exported')
           }}
         >
           <span className="sheet__icon">↑</span> Export data

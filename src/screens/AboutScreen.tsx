@@ -1,8 +1,18 @@
+import { useState } from 'react'
 import { useRegisterOverlay } from '../components/overlay'
+import { analyticsEnabled, setAnalyticsEnabled } from '../posthog'
 
 /** About + privacy. Opened from the menu; full-screen overlay. */
 export function AboutScreen({ onClose }: { onClose: () => void }) {
   useRegisterOverlay('about')
+  const [analytics, setAnalytics] = useState(analyticsEnabled)
+
+  function toggleAnalytics() {
+    const next = !analytics
+    setAnalyticsEnabled(next)
+    setAnalytics(next)
+  }
+
   return (
     <div className="fullscreen">
       <div className="detail__bar">
@@ -22,6 +32,29 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
           your browser. There are no accounts, and we do not receive your trip
           details — they never leave your phone.
         </p>
+
+        <h2 className="about__h2">Usage analytics</h2>
+        <p>
+          Analytics are <strong>off until you turn them on</strong>. Turn them
+          on and the app reports anonymous counts of actions like "a trip was
+          logged" or "a backup was exported", so we can see which features get
+          used. Each event carries counts and labels only, such as how many
+          segments a trip had. Station names, routes, and times are never sent.
+          Crash reports are sent too, so we can fix bugs. While the switch is
+          off, the analytics code never starts and nothing is sent.
+        </p>
+        <div className="about__setting">
+          <span className="about__setting-label">Share usage analytics</span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={analytics}
+            className={`toggle${analytics ? ' toggle--on' : ''}`}
+            onClick={toggleAnalytics}
+          >
+            <span className="toggle__knob" />
+          </button>
+        </div>
 
         <h2 className="about__h2">Back up your trips</h2>
         <p>
