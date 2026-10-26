@@ -83,8 +83,8 @@ Parked / planned: see §10.
 | Map | Leaflet + `react-leaflet` | Geographic, GTFS shapes as polylines |
 | Visualizations | Dependency-free CSS | Computed live from IndexedDB (D3 proved unnecessary) |
 | Routing | Manual builder (built); Google Directions proxy (planned) | Manual route building covers everything today |
-| Hosting | Oracle Cloud (nginx + Let's Encrypt) | Static build at traintrack.harmo.nyc |
-| CI/CD | GitHub Actions | Push to `main` → build → rsync to server; monthly GTFS refresh PR |
+| Hosting | Raspberry Pi at home, behind a Cloudflare Tunnel (Caddy, static) | Static build at traintrack.harmo.nyc; Cloudflare terminates TLS |
+| CI/CD | GitHub Actions | Push to `main` → build → publish a GitHub Release; the pi pulls it on a timer; monthly GTFS refresh PR |
 
 **Typography:** `"Helvetica Neue", Helvetica, Arial, sans-serif`. True Helvetica on Apple devices; Arial is a near-identical fallback elsewhere.
 

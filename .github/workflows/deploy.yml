@@ -10,8 +10,11 @@ concurrency:
   group: deploy
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
-  deploy:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,19 +28,29 @@ jobs:
         run: npm ci
 
       # Vite inlines VITE_* at build time, so PostHog config has to be present
-      # here. The server only ever receives the built dist/.
+      # here. The published artifact is the built dist/ and nothing else.
       - name: Build
         env:
           VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
           VITE_POSTHOG_HOST: ${{ secrets.VITE_POSTHOG_HOST }}
         run: npm run build
 
-      - name: Deploy to harmo.nyc
+      # index.html must sit at the archive root: traintrack-sync on the pi
+      # refuses to publish a release without it.
+      - name: Package dist
+        run: tar -czf dist.tar.gz -C dist .
+
+      - name: Pick a tag
+        id: tag
+        run: echo "tag=build-$(date -u +%Y%m%d%H%M%S)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      # The pi polls the latest release and pulls this asset. Pull rather than
+      # push, because the pi has no inbound path.
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H harmo.nyc >> ~/.ssh/known_hosts 2>/dev/null
-          rsync -az --delete \
-            -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes" \
-            dist/ ubuntu@harmo.nyc:/var/www/traintrack/
+          gh release create "${{ steps.tag.outputs.tag }}" dist.tar.gz \
+            --target "$GITHUB_SHA" \
+            --title "${{ steps.tag.outputs.tag }}" \
+            --notes "Automated build of ${GITHUB_SHA::7}"
